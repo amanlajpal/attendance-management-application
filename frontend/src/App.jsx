@@ -1,12 +1,11 @@
-import Container from "@mui/material/Container";
-import Register from "./pages/register";
 import "./App.css";
+import Login from "./pages/login";
 
 function App() {
   return (
     <>
       <div className="bg-slate-100 h-screen flex justify-center items-center">
-        <Register />
+        <Login />
       </div>
     </>
   );
