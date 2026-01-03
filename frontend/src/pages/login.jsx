@@ -65,7 +65,10 @@ export default function Login() {
                 Signin
               </Button>
               <p className="text-center">
-                Don't have account ? <button className="text-blue-600 dark:text-sky-400">Register</button>
+                Don't have account ?{" "}
+                <button className="text-blue-600 dark:text-sky-400">
+                  Register
+                </button>
               </p>
             </div>
           </form>
