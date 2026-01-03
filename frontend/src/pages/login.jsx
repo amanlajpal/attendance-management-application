@@ -31,6 +31,7 @@ export default function Login() {
                   id="email"
                   placeholder="Enter your Email"
                   className="px-2 py-1 border-2 border-gray-300 rounded h-full"
+                  autoComplete="true"
                 ></input>
               </div>
               <div className="flex w-full">
@@ -43,6 +44,7 @@ export default function Login() {
                         id="password"
                         placeholder="Enter your Password"
                         className="px-2 py-1 border-2 border-gray-300 rounded w-full h-full"
+                        autoComplete="true"
                       ></input>
                     </div>
                     <div className="flex-auto">
