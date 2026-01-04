@@ -9,7 +9,7 @@ client.query(`
         (
             id SERIAL PRIMARY KEY,
             name VARCHAR NOT NULL,
-            email CITEXT UNIQUE NOT NULL
-            password VARCHAR UNIQUE NOT NULL,
+            email CITEXT UNIQUE NOT NULL,
+            password VARCHAR NOT NULL
         );
     `)
