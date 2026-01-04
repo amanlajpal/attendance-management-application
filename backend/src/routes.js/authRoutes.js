@@ -1,9 +1,41 @@
 import express from "express";
+import bcrypt from "bcryptjs";
+import client from "../connection/pgdb.js";
 
 const authRouter = express.Router();
 
-authRouter.get("/login", (req, res) => {
-    res.send("Logged In");
+authRouter.post("/register", async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            res.status(404).send({
+                message: "All fields are mandatory"
+            })
+        }
+
+        const foundUsers = (await client.query("SELECT * FROM users WHERE email = $1", [email])).rows;
+
+        if (foundUsers.length > 0) {
+            res.status(409).send({
+                message: "User already registered"
+            })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, +process.env.SALT);
+
+        const createdUser = (await client.query("INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *", [name, email, hashedPassword])).rows[0];
+
+        res.status(201).send({
+            message: "User registered successfully",
+            user: createdUser
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: "Internal Server Error"
+        })
+    }
 });
 
 
