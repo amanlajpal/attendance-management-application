@@ -9,6 +9,7 @@ import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import Dashboard from "./pages/dashboard";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     Component: Register,
+  },
+  {
+    path: "/dashboard",
+    Component: Dashboard,
   },
 ]);
 
