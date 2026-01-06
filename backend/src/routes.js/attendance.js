@@ -4,7 +4,8 @@ import client from "../connection/pgdb.js"
 const attendanceRouter = express.Router();
 
 attendanceRouter.post("/create", async (req, res, next) => {
-    const { attendee_id, attendance, comment } = req.body;
+    const { attendee_id, attendance } = req.body;
+    let { comment } = req.body;
 
     if (!attendee_id || !attendance) {
         res.status(404).send({
@@ -12,7 +13,11 @@ attendanceRouter.post("/create", async (req, res, next) => {
         })
     }
 
-    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE date_trunc('day', created_at) = CURRENT_DATE;"))?.rows?.[0];
+    if (comment == "") {
+        comment = null;
+    }
+
+    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE attendee_id = $1 AND date_trunc('day', created_at) = CURRENT_DATE;", [attendee_id]))?.rows?.[0];
 
     if (attendanceFound) {
         res.status(409).send({
@@ -23,7 +28,7 @@ attendanceRouter.post("/create", async (req, res, next) => {
         const createdAttendance = (await client.query("INSERT INTO attendance (attendee_id, attendance, comment) VALUES ($1, $2, $3) RETURNING *", [attendee_id, attendance, comment])).rows[0];
 
         res.status(201).send({
-            message: "Attendee created successfully",
+            message: "Attendance created successfully",
             data: createdAttendance
         })
     }
@@ -31,8 +36,8 @@ attendanceRouter.post("/create", async (req, res, next) => {
 
 attendanceRouter.put("/update", async (req, res, next) => {
 
-    console.log(req.body);
-    const { attendee_id, attendance, comment } = req.body;
+    const { attendee_id, attendance } = req.body;
+    let { comment } = req.body;
 
     if (!attendee_id || !attendance) {
         res.status(404).send({
@@ -40,7 +45,11 @@ attendanceRouter.put("/update", async (req, res, next) => {
         })
     }
 
-    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE date_trunc('day', created_at) = CURRENT_DATE;"))?.rows?.[0];
+    if (comment == "") {
+        comment = null;
+    }
+
+    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE  attendee_id = $1 AND date_trunc('day', created_at) = CURRENT_DATE;", [attendee_id]))?.rows?.[0];
 
     if (attendanceFound) {
         const updatedAttendance = (await client.query("UPDATE attendance SET attendee_id = $1, attendance = $2, comment = $3 WHERE id = $4 RETURNING *;", [attendee_id, attendance, comment, attendanceFound.id])).rows[0];
@@ -54,6 +63,27 @@ attendanceRouter.put("/update", async (req, res, next) => {
             message: "Attendance not found",
         })
     }
+})
+
+attendanceRouter.get("/", async (req, res, next) => {
+
+    const attendance = (await client.query(`
+        SELECT 
+            attendance.id,
+            attendees.name AS attendee_name,
+            attendees.id AS attendee_id,
+            attendance.attendance,
+            attendance.comment
+        FROM attendance 
+        LEFT JOIN attendees ON attendees.id = attendance.attendee_id 
+        WHERE date_trunc('day', attendance.created_at) = CURRENT_DATE;
+    `))?.rows;
+
+    res.status(200).send({
+        message: "Attendance updated successfully",
+        data: attendance
+    })
+
 })
 
 
