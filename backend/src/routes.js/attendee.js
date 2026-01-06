@@ -15,13 +15,19 @@ attendeeRouter.post("/createAttendee", async (req, res, next) => {
 })
 
 attendeeRouter.put("/updateAttendee", async (req, res, next) => {
-    const { attendeeName } = req.body;
+    const { id, name } = req.body;
 
-    const createdAttendee = await client.query("INSERT INTO attendees (name) VALUES ($1) RETURNING *", [attendeeName]);
+    if(!id || !name){
+        res.status(404).send({
+            message: "Please send both Attendee name and id"
+        })
+    }
+
+    const updatedAttendee = (await client.query("UPDATE attendees SET name = $1 WHERE id = $2 RETURNING *", [name, id])).rows[0];
 
     res.status(201).send({
-        message: "Attendee created successfully",
-        data: createdAttendee
+        message: "Attendee updated successfully",
+        data: updatedAttendee
     })
 })
 
