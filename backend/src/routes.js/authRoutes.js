@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import client from "../connection/pgdb.js";
 import jwt from "jsonwebtoken";
+import authorization from "../middlewares/authorization.js";
 
 const authRouter = express.Router();
 
@@ -79,5 +80,16 @@ authRouter.post("/login", async (req, res) => {
         })
     }
 })
+
+authRouter.use(authorization);
+
+authRouter.post("/logout", async (req, res) => {
+    res.clearCookie("jwt", { httpOnly: true });
+    res.status(200).send({
+        message: "User logged out successfully"
+    })
+})
+
+
 
 export default authRouter;
