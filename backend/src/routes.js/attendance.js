@@ -52,7 +52,7 @@ attendanceRouter.put("/update", async (req, res, next) => {
     const attendanceFound = (await client.query("SELECT * FROM attendance WHERE  attendee_id = $1 AND date_trunc('day', created_at) = CURRENT_DATE;", [attendee_id]))?.rows?.[0];
 
     if (attendanceFound) {
-        const updatedAttendance = (await client.query("UPDATE attendance SET attendee_id = $1, attendance = $2, comment = $3 WHERE id = $4 RETURNING *;", [attendee_id, attendance, comment, attendanceFound.id])).rows[0];
+        const updatedAttendance = (await client.query("UPDATE attendance SET attendee_id = $1, attendance = $2, comment = $3, updated_at = NOW() WHERE id = $4 RETURNING *;", [attendee_id, attendance, comment, attendanceFound.id])).rows[0];
 
         res.status(200).send({
             message: "Attendance updated successfully",
@@ -73,7 +73,10 @@ attendanceRouter.get("/", async (req, res, next) => {
             attendees.name AS attendee_name,
             attendees.id AS attendee_id,
             attendance.attendance,
-            attendance.comment
+            attendance.comment,
+            attendance.created_at,
+            attendance.updated_at,
+            attendance.deleted_at
         FROM attendance 
         LEFT JOIN attendees ON attendees.id = attendance.attendee_id 
         WHERE date_trunc('day', attendance.created_at) = CURRENT_DATE;
@@ -83,7 +86,21 @@ attendanceRouter.get("/", async (req, res, next) => {
         message: "Attendance updated successfully",
         data: attendance
     })
+})
 
+attendanceRouter.delete("/:id", async (req, res, next) => {
+
+    const attendanceId = req.params.id
+
+    const deletedAttendance = (await client.query(`
+        UPDATE attendance
+        SET deleted_at = NOW()
+        WHERE id = $1;
+    `, [attendanceId]))?.rows;
+
+    res.status(200).send({
+        message: "Attendance deleted successfully",
+    })
 })
 
 
