@@ -3,7 +3,7 @@ import client from "../connection/pgdb.js"
 
 const attendeeRouter = express.Router();
 
-attendeeRouter.post("/createAttendee", async (req, res, next) => {
+attendeeRouter.post("/create", async (req, res, next) => {
     const { name } = req.body;
 
     const createdAttendee = (await client.query("INSERT INTO attendees (name) VALUES ($1) RETURNING *", [name])).rows[0];
@@ -14,7 +14,7 @@ attendeeRouter.post("/createAttendee", async (req, res, next) => {
     })
 })
 
-attendeeRouter.put("/updateAttendee", async (req, res, next) => {
+attendeeRouter.put("/update", async (req, res, next) => {
     const { id, name } = req.body;
 
     if(!id || !name){

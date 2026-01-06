@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import logger from "./src/middlewares/logger.js"
 import authRouter from "./src/routes.js/authRoutes.js";
 import attendeeRouter from "./src/routes.js/attendee.js"
+import attendanceRouter from "./src/routes.js/attendance.js"
 import authorization from "./src/middlewares/authorization.js";
 
 dotenv.config();
@@ -18,7 +19,9 @@ app.use("/auth", authRouter);
 
 app.use(authorization);
 
-app.use("/attendance", attendeeRouter);
+app.use("/attendee", attendeeRouter);
+
+app.use("/attendance", attendanceRouter);
 
 app.use((err, req, res, next) => {
     console.log("error handler")
