@@ -30,7 +30,7 @@ authRouter.post("/register", async (req, res) => {
 
         res.status(201).send({
             message: "User registered successfully",
-            user: createdUser
+            data: createdUser
         })
     } catch (error) {
         console.error(error);

@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import logger from "./src/middlewares/logger.js"
 import authRouter from "./src/routes.js/authRoutes.js";
 import attendeeRouter from "./src/routes.js/attendee.js"
@@ -10,8 +11,12 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+app.use(cors({
+    origin: process.env.ALLOWED_ORIGIN, // Allow only a specific origin
+    credentials: true,            // Enable cookies and credentials
+}))
 
+app.use(express.json());
 
 app.use(logger);
 
@@ -26,7 +31,7 @@ app.use("/attendance", attendanceRouter);
 app.use((err, req, res, next) => {
     console.log("error handler")
     console.dir(err);
-    
+
     res.status(500).send({
         message: "Internal Server Error",
     })
