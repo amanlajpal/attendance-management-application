@@ -1,15 +1,11 @@
 import React from "react";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
+import FormDialog from "./createAttendeeFormDialog";
+import axiosInstance from "../utility/axiosInstance";
 
 export default function Table() {
-  const [rows, setRows] = React.useState([
-    {
-      id: 1,
-      name: "Aman",
-      attendance: "P",
-      comment: "Test Comment",
-    },
-  ]);
+  const [rows, setRows] = React.useState([]);
+  const [rowCount, setRowCount] = React.useState(0);
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
     pageSize: 10,
@@ -17,44 +13,68 @@ export default function Table() {
   const [filterModel, setFilterModel] = React.useState({ items: [] });
   const [sortModel, setSortModel] = React.useState([]);
 
-  console.log(import.meta.env.VITE_API_URL); // "123"
-  // console.log(VITE_API_URL);
-
-  // React.useEffect(() => {
-  //   const fetcher = async () => {
-  //     // fetch data from server
-  //     const data = await fetch(VITE_API_URL, {
-  //       method: "GET",
-  //       body: JSON.stringify({
-  //         page: paginationModel.page,
-  //         pageSize: paginationModel.pageSize,
-  //         sortModel,
-  //         filterModel,
-  //       }),
-  //     });
-  //     setRows(data.rows);
-  //   };
-  //   fetcher();
-  // }, [paginationModel, sortModel, filterModel]);
+  React.useEffect(() => {
+    const fetcher = async () => {
+      try {
+        const response = await axiosInstance.get("/attendance", {
+          params: {
+            page: paginationModel.page,
+            pageSize: paginationModel.pageSize,
+            // sortModel,
+            // filterModel,
+          },
+        });
+        const totalRowsCount = response.data.data.totalRowsCount;
+        setRowCount(totalRowsCount);
+        setRows(response.data.data.rows);
+        // alert(response.data.message);
+      } catch (error) {
+        alert(error.response?.data?.message || "Unable to load Attendance!");
+      }
+    };
+    fetcher();
+  }, [paginationModel, sortModel, filterModel]);
 
   const columns = [
-    { field: "id", flex: 1 },
-    { field: "name", flex: 1 },
+    // { field: "id", flex: 1 },
+    { field: "attendee_id", flex: 1 },
+    { field: "attendee_name", flex: 1 },
     { field: "attendance", flex: 1 },
     { field: "comment", flex: 1 },
+    // { field: "created_at", flex: 1 },
+    // { field: "updated_at", flex: 1 },
   ];
 
   return (
-    <DataGrid
-      columns={columns}
-      rows={rows}
-      pagination
-      sortingMode="server"
-      filterMode="server"
-      paginationMode="server"
-      onPaginationModelChange={setPaginationModel}
-      onSortModelChange={setSortModel}
-      onFilterModelChange={setFilterModel}
-    />
+    <>
+      <div className="w-full flex justify-end gap-5 py-2 px-2 bg-white rounded-t border-t border-r border-l border-gray-300">
+        <input type="date"></input>
+        <FormDialog />
+      </div>
+      <div className="h-11/12">
+        <DataGrid
+          getRowId={(row) => {
+            return row.attendee_id;
+          }}
+          columns={columns}
+          rows={rows}
+          rowCount={rowCount}
+          pagination
+          pageSizeOptions={[10, 25, 100]}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 10, page: 0 },
+            },
+          }}
+          sortingMode="server"
+          filterMode="server"
+          paginationMode="server"
+          onPaginationModelChange={setPaginationModel}
+          onSortModelChange={setSortModel}
+          onFilterModelChange={setFilterModel}
+          sx={{ borderTopLeftRadius: "0px", borderTopRightRadius: "0px" }}
+        />
+      </div>
+    </>
   );
 }
