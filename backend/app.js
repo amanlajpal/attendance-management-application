@@ -6,6 +6,7 @@ import authRouter from "./src/routes.js/authRoutes.js";
 import attendeeRouter from "./src/routes.js/attendee.js"
 import attendanceRouter from "./src/routes.js/attendance.js"
 import authorization from "./src/middlewares/authorization.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use(cors({
 }))
 
 app.use(express.json());
+
+app.use(cookieParser())
 
 app.use(logger);
 

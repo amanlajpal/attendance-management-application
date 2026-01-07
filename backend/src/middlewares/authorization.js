@@ -2,9 +2,7 @@ import jwt from "jsonwebtoken";
 import client from "../connection/pgdb.js"
 
 export default async function authorization(req, res, next) {
-    const authHeader = req.headers.cookie;
-
-    const token = authHeader?.split("=")[1];
+    const token = req.cookies.jwt;
 
     const jwtPayload = jwt.verify(token, process.env.JWT_SECRET);
 

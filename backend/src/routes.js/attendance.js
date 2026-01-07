@@ -74,9 +74,14 @@ attendanceRouter.put("/update", async (req, res, next) => {
 })
 
 attendanceRouter.get("/", async (req, res, next) => {
+    let { page, pageSize } = req.query;
 
-    const attendance = (await client.query(`
-        SELECT 
+    page = page ? +page : 0;
+
+    const limit = pageSize || 10;
+    const offset = page * limit;
+
+    const getAttendanceQuery = `SELECT 
             attendance.id,
             attendees.name AS attendee_name,
             attendees.id AS attendee_id,
@@ -86,13 +91,29 @@ attendanceRouter.get("/", async (req, res, next) => {
             attendance.updated_at,
             attendance.deleted_at
         FROM attendance 
-        LEFT JOIN attendees ON attendees.id = attendance.attendee_id AND attendees.deleted_at IS NULL
-        WHERE date_trunc('day', attendance.created_at) = CURRENT_DATE;
-    `))?.rows;
+        RIGHT JOIN attendees ON attendees.id = attendance.attendee_id AND attendees.deleted_at IS NULL
+        WHERE date_trunc('day', attendance.created_at) = CURRENT_DATE OR attendance.created_at IS NULL`;
+
+    const totalRowsCount = (await client.query(`
+            SELECT COUNT(*)
+            FROM 
+            (
+                ${getAttendanceQuery}
+            ) AS sq;
+        `)).rows[0].count
+
+    const attendance = (await client.query(`
+        ${getAttendanceQuery}
+        LIMIT $1 OFFSET $2;
+    `, [limit, offset]))?.rows;
 
     res.status(200).send({
-        message: "Attendance updated successfully",
-        data: attendance
+        message: "Attendance loaded successfully",
+        data: {
+            rows: attendance,
+            page: page,
+            totalRowsCount: +totalRowsCount
+        }
     })
 })
 
