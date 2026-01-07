@@ -21,14 +21,17 @@ async function createUserAndRelatedExtension() {
             CREATE TABLE IF NOT EXISTS attendees
             (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR NOT NULL
+                name VARCHAR NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                deleted_at TIMESTAMP
             );
         `)
 
 
-    // await client.query(`
-    //         CREATE TYPE attendance_enum AS ENUM ('P', 'A');
-    //     `)
+    await client.query(`
+            CREATE TYPE attendance_enum AS ENUM ('P', 'A');
+        `)
 
 
     await client.query(`

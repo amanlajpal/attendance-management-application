@@ -78,7 +78,7 @@ attendanceRouter.get("/", async (req, res, next) => {
             attendance.updated_at,
             attendance.deleted_at
         FROM attendance 
-        LEFT JOIN attendees ON attendees.id = attendance.attendee_id 
+        LEFT JOIN attendees ON attendees.id = attendance.attendee_id AND attendees.deleted_at IS NULL
         WHERE date_trunc('day', attendance.created_at) = CURRENT_DATE;
     `))?.rows;
 
@@ -87,22 +87,6 @@ attendanceRouter.get("/", async (req, res, next) => {
         data: attendance
     })
 })
-
-attendanceRouter.delete("/:id", async (req, res, next) => {
-
-    const attendanceId = req.params.id
-
-    const deletedAttendance = (await client.query(`
-        UPDATE attendance
-        SET deleted_at = NOW()
-        WHERE id = $1;
-    `, [attendanceId]))?.rows;
-
-    res.status(200).send({
-        message: "Attendance deleted successfully",
-    })
-})
-
 
 
 export default attendanceRouter;

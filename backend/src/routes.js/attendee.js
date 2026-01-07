@@ -31,6 +31,26 @@ attendeeRouter.put("/update", async (req, res, next) => {
     })
 })
 
+attendeeRouter.delete("/:id", async (req, res, next) => {
+
+    const attendeeId = req.params.id
+
+    const deletedAttendee = (await client.query(`
+        UPDATE attendees
+        SET deleted_at = NOW()
+        WHERE id = $1;
+    `, [attendeeId]))?.rows;
+
+    if(deletedAttendee.length > 0){
+        res.status(200).send({
+            message: "Attendee deleted successfully",
+        })
+    }else{
+        res.status(404).send({
+            message: "Attendee not found"
+        })
+    }
+})
 
 
 export default attendeeRouter;
