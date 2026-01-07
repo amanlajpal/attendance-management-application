@@ -17,6 +17,14 @@ attendanceRouter.post("/create", async (req, res, next) => {
         comment = null;
     }
 
+    const foundAttendee = (await client.query("SELECT * FROM attendees WHERE id = $1;", [attendee_id])).rows[0]
+
+    if (!foundAttendee) {
+        res.status(404).send({
+            message: "Attendee not found!"
+        })
+    }
+
     const attendanceFound = (await client.query("SELECT * FROM attendance WHERE attendee_id = $1 AND date_trunc('day', created_at) = CURRENT_DATE;", [attendee_id]))?.rows?.[0];
 
     if (attendanceFound) {
