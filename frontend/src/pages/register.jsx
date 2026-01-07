@@ -7,6 +7,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function Register() {
+  
+  const [isHidden, setIsHidden] = useState(true);
+  const navigate = useNavigate();
+  
   const handleRegister = async (formData) => {
     const name = formData.get("name");
     const email = formData.get("email");
@@ -19,14 +23,11 @@ export default function Register() {
         password,
       });
       alert(response.data.message);
-      handleRedirectToLogin();
+      navigate("/login");
     } catch (error) {
-      alert("User registeration failed!");
+      alert(error.response?.data.message || "User registeration failed!");
     }
   };
-
-  const [isHidden, setIsHidden] = useState(true);
-  const navigate = useNavigate();
 
   const handlePasswordVisibility = () => {
     setIsHidden((prevIsHidden) => {
@@ -34,7 +35,8 @@ export default function Register() {
     });
   };
 
-  const handleRedirectToLogin = () => {
+  const handleRedirectToLogin = (event) => {
+    event.preventDefault();
     navigate("/login");
   };
 

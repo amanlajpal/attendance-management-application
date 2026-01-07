@@ -4,11 +4,27 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import axiosInstance from "../utility/axiosInstance";
 
 export default function Login() {
-  const handleLogin = (event) => {};
   const [isHidden, setIsHidden] = useState(true);
   let navigate = useNavigate();
+  
+  const handleLogin = async (formData) => {
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const response = await axiosInstance.post("/auth/login", {
+        email,
+        password,
+      });
+      alert(response.data.message);
+      navigate("/dashboard");
+    } catch (error) {
+      alert(error.response?.data?.message || "User login failed!");
+    }
+  };
 
   const handlePasswordVisibility = () => {
     setIsHidden((prevIsHidden) => {
@@ -16,8 +32,9 @@ export default function Login() {
     });
   };
 
-  const handleRedirectToRegister = () => {
-    navigate("/register")
+  const handleRedirectToRegister = (event) => {
+    event.preventDefault();
+    navigate("/register");
   };
 
   return (
@@ -29,13 +46,14 @@ export default function Login() {
               <h2 className="text-center text-2xl">Welcome to</h2>
               <p className="text-center">Attendance Tracking Application</p>
             </div>
-            <form className="flex flex-col gap-10 h-full">
+            <form className="flex flex-col gap-10 h-full" action={handleLogin}>
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="email">Email</label>
                   <input
                     type="email"
                     id="email"
+                    name="email"
                     placeholder="Enter your Email"
                     className="px-2 py-1 border-2 border-gray-300 rounded h-full"
                     autoComplete="true"
@@ -49,6 +67,7 @@ export default function Login() {
                         <input
                           type={isHidden ? "password" : "text"}
                           id="password"
+                          name="password"
                           placeholder="Enter your Password"
                           className="px-2 py-1 border-2 border-gray-300 rounded w-full h-full"
                           autoComplete="true"
@@ -72,7 +91,7 @@ export default function Login() {
                 </div>
               </div>
               <div className="flex flex-col gap-4">
-                <Button variant="contained" onClick={handleLogin} fullWidth>
+                <Button variant="contained" type="submit" fullWidth>
                   Signin
                 </Button>
                 <p className="text-center">
