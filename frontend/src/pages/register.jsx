@@ -2,11 +2,29 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import axiosInstance from "../utility/axiosInstance.js";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function Register() {
-  const handleRegister = (event) => {};
+  const handleRegister = async (formData) => {
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const response = await axiosInstance.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+      alert(response.data.message);
+      handleRedirectToLogin();
+    } catch (error) {
+      alert("User registeration failed!");
+    }
+  };
+
   const [isHidden, setIsHidden] = useState(true);
   const navigate = useNavigate();
 
@@ -29,13 +47,17 @@ export default function Register() {
               <h2 className="text-center text-2xl">Register to</h2>
               <p className="text-center">Attendance Tracking Application</p>
             </div>
-            <form className="flex flex-col gap-10 h-full">
+            <form
+              className="flex flex-col gap-10 h-full"
+              action={handleRegister}
+            >
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                   <label htmlFor="name">Name</label>
                   <input
                     type="text"
                     id="name"
+                    name="name"
                     placeholder="Enter your Name"
                     className="px-2 py-1 border-2 border-gray-300 rounded h-full"
                   ></input>
@@ -45,6 +67,7 @@ export default function Register() {
                   <input
                     type="email"
                     id="email"
+                    name="email"
                     placeholder="Enter your Email"
                     className="px-2 py-1 border-2 border-gray-300 rounded h-full"
                   ></input>
@@ -57,6 +80,7 @@ export default function Register() {
                         <input
                           type={isHidden ? "password" : "text"}
                           id="password"
+                          name="password"
                           placeholder="Enter your Password"
                           className="px-2 py-1 border-2 border-gray-300 rounded w-full h-full"
                         ></input>
@@ -79,7 +103,7 @@ export default function Register() {
                 </div>
               </div>
               <div className="flex flex-col gap-4">
-                <Button variant="contained" onClick={handleRegister} fullWidth>
+                <Button type="submit" variant="contained" fullWidth>
                   Signup
                 </Button>
                 <p className="text-center">
