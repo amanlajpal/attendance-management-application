@@ -1,11 +1,25 @@
 import React from "react";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
-import FormDialog from "./createAttendeeFormDialog";
+import FormDialog from "./createAttendeeFormDialog.jsx";
 import axiosInstance from "../utility/axiosInstance";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UpdateAttendanceFormDialog from "./updateAttendanceFormDialog.jsx";
+import IconButton from "@mui/material/IconButton";
+
+function ActionsCell(props) {
+  return (
+    <React.Fragment>
+      <UpdateAttendanceFormDialog {...props} />
+      <IconButton aria-label="delete">
+        <DeleteIcon />
+      </IconButton>
+    </React.Fragment>
+  );
+}
 
 export default function Table() {
   const [rows, setRows] = React.useState([]);
@@ -16,6 +30,7 @@ export default function Table() {
   });
   const [date, setDate] = React.useState(dayjs(new Date()));
   const [sortModel, setSortModel] = React.useState([]);
+  const [refresh, setRefresh] = React.useState(false);
 
   React.useEffect(() => {
     const fetcher = async () => {
@@ -35,7 +50,7 @@ export default function Table() {
       }
     };
     fetcher();
-  }, [paginationModel, sortModel, date]);
+  }, [paginationModel, sortModel, date, refresh]);
 
   const columns = [
     { field: "id", headerName: "Attendance Id", flex: 1 },
@@ -45,6 +60,14 @@ export default function Table() {
     { field: "comment", headerName: "Comment", flex: 1 },
     { field: "created_at", headerName: "Created At", flex: 1 },
     { field: "updated_at", headerName: "Marked At", flex: 1 },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      cellClassName: "actions",
+      renderCell: (params) => <ActionsCell {...params} setRefresh={setRefresh} />,
+    },
   ];
 
   const handleDateFilter = (newVal) => {
@@ -69,7 +92,11 @@ export default function Table() {
             getRowId={(row) => {
               return row.attendee_id;
             }}
-            columnVisibilityModel={{ id: false, created_at: false, updated_at: false }}
+            columnVisibilityModel={{
+              id: false,
+              created_at: false,
+              updated_at: false,
+            }}
             columns={columns}
             rows={rows}
             rowCount={rowCount}
