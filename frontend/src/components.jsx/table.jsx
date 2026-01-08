@@ -14,7 +14,7 @@ export default function Table() {
     page: 0,
     pageSize: 10,
   });
-  const [filterModel, setFilterModel] = React.useState({ items: [] });
+  const [date, setDate] = React.useState(dayjs(new Date()));
   const [sortModel, setSortModel] = React.useState([]);
 
   React.useEffect(() => {
@@ -24,30 +24,32 @@ export default function Table() {
           params: {
             page: paginationModel.page,
             pageSize: paginationModel.pageSize,
-            // sortModel,
-            // filterModel,
+            date: date.format("YYYY-MM-DD"),
           },
         });
         const totalRowsCount = response.data.data.totalRowsCount;
         setRowCount(totalRowsCount);
         setRows(response.data.data.rows);
-        // alert(response.data.message);
       } catch (error) {
         alert(error.response?.data?.message || "Unable to load Attendance!");
       }
     };
     fetcher();
-  }, [paginationModel, sortModel, filterModel]);
+  }, [paginationModel, sortModel, date]);
 
   const columns = [
-    // { field: "id", flex: 1 },
-    { field: "attendee_id", flex: 1 },
-    { field: "attendee_name", flex: 1 },
-    { field: "attendance", flex: 1 },
-    { field: "comment", flex: 1 },
-    // { field: "created_at", flex: 1 },
-    // { field: "updated_at", flex: 1 },
+    { field: "id", headerName: "Attendance Id", flex: 1 },
+    { field: "attendee_id", headerName: "Attendee Id", flex: 1 },
+    { field: "attendee_name", headerName: "Name", flex: 1 },
+    { field: "attendance", headerName: "Attendance", flex: 1 },
+    { field: "comment", headerName: "Comment", flex: 1 },
+    { field: "created_at", headerName: "Created At", flex: 1 },
+    { field: "updated_at", headerName: "Marked At", flex: 1 },
   ];
+
+  const handleDateFilter = (newVal) => {
+    setDate(newVal);
+  };
 
   return (
     <>
@@ -55,8 +57,9 @@ export default function Table() {
         <div className="w-full flex justify-end gap-5 py-2 px-2 bg-white rounded-t border-t border-r border-l border-gray-300">
           <div className="w-1/7">
             <DatePicker
-              defaultValue={dayjs("2026-01-07")}
               slotProps={{ textField: { size: "small" } }}
+              value={date}
+              onChange={handleDateFilter}
             />
           </div>
           <FormDialog />
@@ -66,6 +69,7 @@ export default function Table() {
             getRowId={(row) => {
               return row.attendee_id;
             }}
+            columnVisibilityModel={{ id: false, created_at: false, updated_at: false }}
             columns={columns}
             rows={rows}
             rowCount={rowCount}
@@ -81,7 +85,6 @@ export default function Table() {
             paginationMode="server"
             onPaginationModelChange={setPaginationModel}
             onSortModelChange={setSortModel}
-            onFilterModelChange={setFilterModel}
             sx={{ borderTopLeftRadius: "0px", borderTopRightRadius: "0px" }}
           />
         </div>
