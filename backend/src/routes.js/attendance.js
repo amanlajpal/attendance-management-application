@@ -99,7 +99,8 @@ attendanceRouter.get("/", async (req, res, next) => {
                 ${date
             ? `date_trunc('day', attendance.created_at) = '${date}'`
             : "date_trunc('day', attendance.created_at) = CURRENT_DATE"
-        }`;
+        }
+    ORDER BY attendees.id`;
 
     const totalRowsCount = (await client.query(`
             SELECT COUNT(*)
