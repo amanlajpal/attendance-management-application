@@ -74,7 +74,7 @@ attendanceRouter.put("/update", async (req, res, next) => {
 })
 
 attendanceRouter.get("/", async (req, res, next) => {
-    let { page, pageSize } = req.query;
+    let { page, pageSize, date } = req.query;
 
     page = page ? +page : 0;
 
@@ -95,7 +95,11 @@ attendanceRouter.get("/", async (req, res, next) => {
     LEFT JOIN attendance 
         ON attendees.id = attendance.attendee_id 
             AND attendees.deleted_at IS NULL 
-            AND date_trunc('day', attendance.created_at) = CURRENT_DATE`;
+            AND 
+                ${date
+            ? `date_trunc('day', attendance.created_at) = '${date}'`
+            : "date_trunc('day', attendance.created_at) = CURRENT_DATE"
+        }`;
 
     const totalRowsCount = (await client.query(`
             SELECT COUNT(*)
