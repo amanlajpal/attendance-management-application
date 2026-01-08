@@ -2,6 +2,10 @@ import React from "react";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import FormDialog from "./createAttendeeFormDialog";
 import axiosInstance from "../utility/axiosInstance";
+import dayjs from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export default function Table() {
   const [rows, setRows] = React.useState([]);
@@ -47,34 +51,41 @@ export default function Table() {
 
   return (
     <>
-      <div className="w-full flex justify-end gap-5 py-2 px-2 bg-white rounded-t border-t border-r border-l border-gray-300">
-        <input type="date"></input>
-        <FormDialog />
-      </div>
-      <div className="h-11/12">
-        <DataGrid
-          getRowId={(row) => {
-            return row.attendee_id;
-          }}
-          columns={columns}
-          rows={rows}
-          rowCount={rowCount}
-          pagination
-          pageSizeOptions={[10, 25, 100]}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10, page: 0 },
-            },
-          }}
-          sortingMode="server"
-          filterMode="server"
-          paginationMode="server"
-          onPaginationModelChange={setPaginationModel}
-          onSortModelChange={setSortModel}
-          onFilterModelChange={setFilterModel}
-          sx={{ borderTopLeftRadius: "0px", borderTopRightRadius: "0px" }}
-        />
-      </div>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <div className="w-full flex justify-end gap-5 py-2 px-2 bg-white rounded-t border-t border-r border-l border-gray-300">
+          <div className="w-1/7">
+            <DatePicker
+              defaultValue={dayjs("2026-01-07")}
+              slotProps={{ textField: { size: "small" } }}
+            />
+          </div>
+          <FormDialog />
+        </div>
+        <div className="h-11/12">
+          <DataGrid
+            getRowId={(row) => {
+              return row.attendee_id;
+            }}
+            columns={columns}
+            rows={rows}
+            rowCount={rowCount}
+            pagination
+            pageSizeOptions={[10, 25, 100]}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+            }}
+            sortingMode="server"
+            filterMode="server"
+            paginationMode="server"
+            onPaginationModelChange={setPaginationModel}
+            onSortModelChange={setSortModel}
+            onFilterModelChange={setFilterModel}
+            sx={{ borderTopLeftRadius: "0px", borderTopRightRadius: "0px" }}
+          />
+        </div>
+      </LocalizationProvider>
     </>
   );
 }
