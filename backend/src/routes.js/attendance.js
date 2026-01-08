@@ -81,18 +81,21 @@ attendanceRouter.get("/", async (req, res, next) => {
     const limit = pageSize || 10;
     const offset = page * limit;
 
-    const getAttendanceQuery = `SELECT 
-            attendance.id,
-            attendees.name AS attendee_name,
-            attendees.id AS attendee_id,
-            attendance.attendance,
-            attendance.comment,
-            attendance.created_at,
-            attendance.updated_at,
-            attendance.deleted_at
-        FROM attendance 
-        RIGHT JOIN attendees ON attendees.id = attendance.attendee_id AND attendees.deleted_at IS NULL
-        WHERE date_trunc('day', attendance.created_at) = CURRENT_DATE OR attendance.created_at IS NULL`;
+    const getAttendanceQuery = `
+    SELECT 
+        attendance.id,
+        attendees.name AS attendee_name,
+        attendees.id AS attendee_id,
+        attendance.attendance,
+        attendance.comment,
+        attendance.created_at,
+        attendance.updated_at,
+        attendance.deleted_at
+    FROM attendees 
+    LEFT JOIN attendance 
+        ON attendees.id = attendance.attendee_id 
+            AND attendees.deleted_at IS NULL 
+            AND date_trunc('day', attendance.created_at) = CURRENT_DATE`;
 
     const totalRowsCount = (await client.query(`
             SELECT COUNT(*)
