@@ -7,9 +7,9 @@ attendanceRouter.post("/create", async (req, res, next) => {
     const { attendee_id, attendance, date } = req.body;
     let { comment } = req.body;
 
-    if (!attendee_id || !attendance) {
+    if (!attendee_id || !attendance || !date) {
         res.status(404).send({
-            message: "Attendee Id and attendance both are mandatory!"
+            message: "Date, Attendee Id and attendance all are mandatory!"
         })
     }
 
@@ -44,12 +44,12 @@ attendanceRouter.post("/create", async (req, res, next) => {
 
 attendanceRouter.put("/update", async (req, res, next) => {
 
-    const { attendee_id, attendance } = req.body;
+    const { attendee_id, attendance, date } = req.body;
     let { comment } = req.body;
 
-    if (!attendee_id || !attendance) {
+    if (!attendee_id || !attendance || !date) {
         res.status(404).send({
-            message: "Attendee Id and attendance both are mandatory!"
+            message: "Date, Attendee Id and attendance all are mandatory!"
         })
     }
 
@@ -57,7 +57,7 @@ attendanceRouter.put("/update", async (req, res, next) => {
         comment = null;
     }
 
-    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE  attendee_id = $1 AND date_trunc('day', created_at) = CURRENT_DATE;", [attendee_id]))?.rows?.[0];
+    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE  attendee_id = $1 AND date_trunc('day', created_at) = $2;", [attendee_id, date]))?.rows?.[0];
 
     if (attendanceFound) {
         const updatedAttendance = (await client.query("UPDATE attendance SET attendee_id = $1, attendance = $2, comment = $3, updated_at = NOW() WHERE id = $4 RETURNING *;", [attendee_id, attendance, comment, attendanceFound.id])).rows[0];
