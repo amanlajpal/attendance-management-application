@@ -5,7 +5,7 @@ import "@fontsource/roboto/700.css";
 import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, replace } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
@@ -13,16 +13,25 @@ import Dashboard from "./pages/dashboard";
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    Component: Login,
-  },
-  {
-    path: "/register",
-    Component: Register,
-  },
-  {
-    path: "/dashboard",
-    Component: Dashboard,
+    path: "/",
+    children: [
+      {
+        index: true,
+        loader: async () => replace("/dashboard"),
+      },
+      {
+        path: "/login",
+        Component: Login,
+      },
+      {
+        path: "/register",
+        Component: Register,
+      },
+      {
+        path: "/dashboard",
+        Component: Dashboard,
+      },
+    ],
   },
 ]);
 
