@@ -94,12 +94,12 @@ attendanceRouter.get("/", async (req, res, next) => {
     FROM attendees 
     LEFT JOIN attendance 
         ON attendees.id = attendance.attendee_id 
-            AND attendees.deleted_at IS NULL 
             AND 
                 ${date
             ? `date_trunc('day', attendance.created_at) = '${date}'`
             : "date_trunc('day', attendance.created_at) = CURRENT_DATE"
         }
+    WHERE attendees.deleted_at IS NULL
     ORDER BY attendees.id`;
 
     const totalRowsCount = (await client.query(`
