@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import FormDialog from "./createAttendeeFormDialog.jsx";
 import axiosInstance from "../utility/axiosInstance";
@@ -9,6 +9,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateAttendanceFormDialog from "./updateAttendanceFormDialog.jsx";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 
 function ActionsCell(props) {
   return (
@@ -17,6 +18,65 @@ function ActionsCell(props) {
       <IconButton aria-label="delete">
         <DeleteIcon />
       </IconButton>
+    </React.Fragment>
+  );
+}
+
+function AttendanceCell(props) {
+  const { row, date } = props;
+  const [attendance, setAttendance] = React.useState(null);
+
+  const handleCreateAttendance = async (attendance) => {
+    try {
+      const createdAttendanceResponse = await axiosInstance.post(
+        "/attendance/create",
+        {
+          attendee_id: row.attendee_id,
+          attendance,
+          date: date.format("YYYY-MM-DD"),
+        }
+      );
+    } catch (error) {
+      alert(error?.response?.data?.message || "Attendance marking failed")
+    }
+  };
+
+  const handlePresent = () => {
+    if (!row.id) {
+      setAttendance("P");
+      handleCreateAttendance("P");
+    }
+  };
+
+  const handleAbsent = () => {
+    if (!row.id) {
+      setAttendance("A");
+      handleCreateAttendance("A");
+    }
+  };
+
+  useEffect(() => {
+    setAttendance(row.attendance);
+  }, [row]);
+
+  return (
+    <React.Fragment>
+      <div className="h-full flex gap-4 items-center">
+        <Button
+          variant={attendance == "P" ? "contained" : "text"}
+          color="success"
+          onClick={handlePresent}
+        >
+          P
+        </Button>
+        <Button
+          variant={attendance == "A" ? "contained" : "text"}
+          color="error"
+          onClick={handleAbsent}
+        >
+          A
+        </Button>
+      </div>
     </React.Fragment>
   );
 }
@@ -56,8 +116,15 @@ export default function Table() {
     { field: "id", headerName: "Attendance Id", flex: 1 },
     { field: "attendee_id", headerName: "Attendee Id", flex: 1 },
     { field: "attendee_name", headerName: "Name", flex: 1 },
-    { field: "attendance", headerName: "Attendance", flex: 1 },
-    { field: "comment", headerName: "Comment", flex: 1 },
+    {
+      field: "attendance",
+      headerName: "Attendance",
+      flex: 1,
+      renderCell: (params) => (
+        <AttendanceCell {...params} setRefresh={setRefresh} date={date}/>
+      ),
+    },
+    { field: "comment", headerName: "Comment", flex: 1, editable: true },
     { field: "created_at", headerName: "Created At", flex: 1 },
     { field: "updated_at", headerName: "Marked At", flex: 1 },
     {
@@ -66,7 +133,9 @@ export default function Table() {
       headerName: "Actions",
       width: 100,
       cellClassName: "actions",
-      renderCell: (params) => <ActionsCell {...params} setRefresh={setRefresh} />,
+      renderCell: (params) => (
+        <ActionsCell {...params} setRefresh={setRefresh} />
+      ),
     },
   ];
 
