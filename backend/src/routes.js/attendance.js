@@ -4,7 +4,7 @@ import client from "../connection/pgdb.js"
 const attendanceRouter = express.Router();
 
 attendanceRouter.post("/create", async (req, res, next) => {
-    const { attendee_id, attendance } = req.body;
+    const { attendee_id, attendance, date } = req.body;
     let { comment } = req.body;
 
     if (!attendee_id || !attendance) {
@@ -25,7 +25,7 @@ attendanceRouter.post("/create", async (req, res, next) => {
         })
     }
 
-    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE attendee_id = $1 AND date_trunc('day', created_at) = CURRENT_DATE;", [attendee_id]))?.rows?.[0];
+    const attendanceFound = (await client.query("SELECT * FROM attendance WHERE attendee_id = $1 AND date_trunc('day', created_at) = $2;", [attendee_id, date]))?.rows?.[0];
 
     if (attendanceFound) {
         res.status(409).send({
@@ -33,10 +33,10 @@ attendanceRouter.post("/create", async (req, res, next) => {
             data: attendanceFound
         })
     } else {
-        const createdAttendance = (await client.query("INSERT INTO attendance (attendee_id, attendance, comment) VALUES ($1, $2, $3) RETURNING *", [attendee_id, attendance, comment])).rows[0];
+        const createdAttendance = (await client.query("INSERT INTO attendance (attendee_id, attendance, comment, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING *", [attendee_id, attendance, comment, date, date])).rows[0];
 
         res.status(201).send({
-            message: "Attendance created successfully",
+            message: "Attendance marked successfully",
             data: createdAttendance
         })
     }
