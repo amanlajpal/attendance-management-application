@@ -6,18 +6,15 @@ import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateAttendanceFormDialog from "./updateAttendanceFormDialog.jsx";
-import IconButton from "@mui/material/IconButton";
+import DeleteAttendanceFormDialog from "./deleteAttendeeDialog.jsx";
 import Button from "@mui/material/Button";
 
 function ActionsCell(props) {
   return (
     <React.Fragment>
       <UpdateAttendanceFormDialog {...props} />
-      <IconButton aria-label="delete">
-        <DeleteIcon />
-      </IconButton>
+      <DeleteAttendanceFormDialog {...props} />
     </React.Fragment>
   );
 }

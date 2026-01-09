@@ -93,7 +93,7 @@ export default function UpdateAttendanceFormDialog(props) {
           {
             attendance,
             comment,
-            attendance_id: row.id
+            attendance_id: row.id,
           }
         );
       }
@@ -121,15 +121,17 @@ export default function UpdateAttendanceFormDialog(props) {
             id="attendee-edit-form"
             className="mt-4"
           >
-            <div className="mb-1">
-              <DatePicker
-                label={"Date"}
-                slotProps={{
-                  textField: { size: "small", variant: "standard" },
-                }}
-                value={date}
-              />
-            </div>
+            {row.id && (
+              <div className="mb-1">
+                <DatePicker
+                  label={"Date"}
+                  slotProps={{
+                    textField: { size: "small", variant: "standard" },
+                  }}
+                  value={date}
+                />
+              </div>
+            )}
             <TextField
               autoFocus
               required
