@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import FormDialog from "./createAttendeeFormDialog.jsx";
 import axiosInstance from "../utility/axiosInstance";
@@ -37,7 +37,7 @@ function AttendanceCell(props) {
         }
       );
     } catch (error) {
-      alert(error?.response?.data?.message || "Attendance marking failed")
+      alert(error?.response?.data?.message || "Attendance marking failed");
     }
   };
 
@@ -55,7 +55,7 @@ function AttendanceCell(props) {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     setAttendance(row.attendance);
   }, [row]);
 
@@ -113,20 +113,58 @@ export default function Table() {
   }, [paginationModel, sortModel, date, refresh]);
 
   const columns = [
-    { field: "id", headerName: "Attendance Id", flex: 1 },
-    { field: "attendee_id", headerName: "Attendee Id", flex: 1 },
-    { field: "attendee_name", headerName: "Name", flex: 1 },
+    {
+      field: "id",
+      headerName: "Attendance Id",
+      flex: 1,
+      filterable: false,
+      sortable: false,
+    },
+    {
+      field: "attendee_id",
+      headerName: "Attendee Id",
+      flex: 1,
+      filterable: false,
+      sortable: false,
+    },
+    {
+      field: "attendee_name",
+      headerName: "Name",
+      flex: 1,
+      filterable: false,
+      sortable: false,
+    },
     {
       field: "attendance",
       headerName: "Attendance",
       flex: 1,
+      filterable: false,
+      sortable: false,
       renderCell: (params) => (
-        <AttendanceCell {...params} setRefresh={setRefresh} date={date}/>
+        <AttendanceCell {...params} setRefresh={setRefresh} date={date} />
       ),
     },
-    { field: "comment", headerName: "Comment", flex: 1, editable: true },
-    { field: "created_at", headerName: "Created At", flex: 1 },
-    { field: "updated_at", headerName: "Marked At", flex: 1 },
+    {
+      field: "comment",
+      headerName: "Comment",
+      flex: 1,
+      filterable: false,
+      sortable: false,
+    },
+    {
+      field: "created_at",
+      headerName: "Created At",
+      flex: 1,
+      filterable: false,
+      sortable: false,
+    },
+    {
+      field: "updated_at",
+      headerName: "Marked At",
+      flex: 1,
+      filterable: false,
+      sortable: false,
+    },
     {
       field: "actions",
       type: "actions",
@@ -134,7 +172,7 @@ export default function Table() {
       width: 100,
       cellClassName: "actions",
       renderCell: (params) => (
-        <ActionsCell {...params} setRefresh={setRefresh} />
+        <ActionsCell {...params} setRefresh={setRefresh} date={date} />
       ),
     },
   ];

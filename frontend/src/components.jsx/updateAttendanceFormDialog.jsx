@@ -9,10 +9,58 @@ import DialogTitle from "@mui/material/DialogTitle";
 import axiosInstance from "../utility/axiosInstance";
 import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
+import { DatePicker } from "@mui/x-date-pickers";
+
+function AttendanceCell(props) {
+  const { attendanceData, setAttendanceData } = props;
+
+  const handlePresent = () => {
+    setAttendanceData((prevAttendanceData) => {
+      return {
+        ...prevAttendanceData,
+        attendance: "P",
+      };
+    });
+  };
+
+  const handleAbsent = () => {
+    setAttendanceData((prevAttendanceData) => {
+      return {
+        ...prevAttendanceData,
+        attendance: "A",
+      };
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <div className="h-full flex gap-4 items-center">
+        <Button
+          variant={attendanceData.attendance == "P" ? "contained" : "text"}
+          color="success"
+          onClick={handlePresent}
+        >
+          P
+        </Button>
+        <Button
+          variant={attendanceData.attendance == "A" ? "contained" : "text"}
+          color="error"
+          onClick={handleAbsent}
+        >
+          A
+        </Button>
+      </div>
+    </React.Fragment>
+  );
+}
 
 export default function UpdateAttendanceFormDialog(props) {
-  const { row, setRefresh } = props;
+  const { row, setRefresh, date } = props;
   const [open, setOpen] = React.useState(false);
+  const [attendanceData, setAttendanceData] = React.useState({
+    attendance: row?.attendance,
+    comment: row?.comment,
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -28,7 +76,7 @@ export default function UpdateAttendanceFormDialog(props) {
     const formData = new FormData(event.currentTarget);
     const formJson = Object.fromEntries(formData.entries());
     const name = formJson.name;
-    const attendance = formJson.attendance;
+    const attendance = attendanceData.attendance;
     const comment = formJson.comment;
 
     try {
@@ -43,9 +91,9 @@ export default function UpdateAttendanceFormDialog(props) {
         const attendanceUpdationResponse = await axiosInstance.put(
           "/attendance/update",
           {
-            attendee_id: row.attendee_id,
             attendance,
             comment,
+            attendance_id: row.id
           }
         );
       }
@@ -68,10 +116,23 @@ export default function UpdateAttendanceFormDialog(props) {
           <DialogContentText>
             Please Note: Updating Attendee Name will update it for all dates.
           </DialogContentText>
-          <form onSubmit={handleSubmit} id="attendee-edit-form">
+          <form
+            onSubmit={handleSubmit}
+            id="attendee-edit-form"
+            className="mt-4"
+          >
+            <div className="mb-1">
+              <DatePicker
+                label={"Date"}
+                slotProps={{
+                  textField: { size: "small", variant: "standard" },
+                }}
+                value={date}
+              />
+            </div>
             <TextField
               autoFocus
-              // required
+              required
               margin="dense"
               id="name"
               name="name"
@@ -83,18 +144,14 @@ export default function UpdateAttendanceFormDialog(props) {
             />
             {row.id && (
               <>
-                <TextField
-                  autoFocus
-                  required
-                  margin="dense"
-                  id="attendance"
-                  name="attendance"
-                  label="Attendance"
-                  type="text"
-                  fullWidth
-                  variant="standard"
-                  defaultValue={row?.attendance}
-                />
+                <div className="flex flex-col gap-2 text-[#00000099] text-sm">
+                  <p>Attendance</p>
+                  <AttendanceCell
+                    {...props}
+                    attendanceData={attendanceData}
+                    setAttendanceData={setAttendanceData}
+                  />
+                </div>
                 <TextField
                   autoFocus
                   margin="dense"
@@ -104,7 +161,7 @@ export default function UpdateAttendanceFormDialog(props) {
                   type="text"
                   fullWidth
                   variant="standard"
-                  defaultValue={row?.comment}
+                  defaultValue={attendanceData?.comment}
                 />
               </>
             )}
