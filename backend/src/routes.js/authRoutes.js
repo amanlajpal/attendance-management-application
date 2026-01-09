@@ -72,7 +72,7 @@ authRouter.post("/login", async (req, res) => {
             httpOnly: true, sameSite: 'strict',
             maxAge: 60 * 60 * 24 * 1000
         });
-        
+
         res.status(200).send({
             message: "Logged in successfully!",
             token
@@ -91,6 +91,16 @@ authRouter.post("/logout", async (req, res) => {
     res.clearCookie("jwt", { httpOnly: true });
     res.status(200).send({
         message: "User logged out successfully"
+    })
+})
+
+authRouter.post("/profile", async (req, res) => {
+    const userId = req.userId;
+    const foundUser = (await client.query(`SELECT * FROM users WHERE id = $1`, [userId])).rows[0];
+
+    res.status(200).send({
+        message: "User profile fetched successfully",
+        data: foundUser
     })
 })
 
