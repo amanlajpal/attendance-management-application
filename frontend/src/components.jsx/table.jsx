@@ -33,6 +33,7 @@ function AttendanceCell(props) {
           date: date.format("YYYY-MM-DD"),
         }
       );
+      setAttendance(attendance);
     } catch (error) {
       alert(error?.response?.data?.message || "Attendance marking failed");
     }
@@ -40,14 +41,12 @@ function AttendanceCell(props) {
 
   const handlePresent = () => {
     if (!row.id) {
-      setAttendance("P");
       handleCreateAttendance("P");
     }
   };
 
   const handleAbsent = () => {
     if (!row.id) {
-      setAttendance("A");
       handleCreateAttendance("A");
     }
   };
