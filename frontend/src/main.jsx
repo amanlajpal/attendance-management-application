@@ -10,6 +10,23 @@ import { RouterProvider } from "react-router/dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
+import axiosInstance from "./utility/axiosInstance";
+
+const checkLoggedIn = async ({ request }) => {
+  try {
+    const path = new URL(request.url).pathname;
+    const response = await axiosInstance.get("/auth/profile");
+    if (response.data.data.id) {
+      if (path == "/login" || path == "/register") {
+        return replace("/dashboard");
+      }
+    } else {
+      return replace("/login");
+    }
+  } catch (error) {
+    return replace("/login");
+  }
+};
 
 const router = createBrowserRouter([
   {
@@ -20,18 +37,25 @@ const router = createBrowserRouter([
         loader: async () => replace("/dashboard"),
       },
       {
-        path: "/login",
+        path: "login",
         Component: Login,
+        loader: checkLoggedIn,
       },
       {
-        path: "/register",
+        path: "register",
         Component: Register,
+        loader: checkLoggedIn,
       },
       {
-        path: "/dashboard",
+        path: "dashboard",
+        loader: checkLoggedIn,
         Component: Dashboard,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <div>Not Found</div>,
   },
 ]);
 

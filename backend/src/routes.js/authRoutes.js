@@ -94,9 +94,9 @@ authRouter.post("/logout", async (req, res) => {
     })
 })
 
-authRouter.post("/profile", async (req, res) => {
+authRouter.get("/profile", async (req, res) => {
     const userId = req.userId;
-    const foundUser = (await client.query(`SELECT * FROM users WHERE id = $1`, [userId])).rows[0];
+    const foundUser = (await client.query(`SELECT id, name, email FROM users WHERE id = $1`, [userId])).rows[0];
 
     res.status(200).send({
         message: "User profile fetched successfully",
