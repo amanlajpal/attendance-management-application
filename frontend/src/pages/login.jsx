@@ -3,13 +3,24 @@ import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utility/axiosInstance";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const [isHidden, setIsHidden] = useState(true);
   let navigate = useNavigate();
-  
+  const { user } = useAuth();
+
+  // if(!user){
+  //   getUser();
+  // }
+
+  console.log(user, "from login page");
+  if (user) {
+    navigate("/dashboard");
+  }
+
   const handleLogin = async (formData) => {
     const email = formData.get("email");
     const password = formData.get("password");
