@@ -2,8 +2,9 @@ import "./App.css";
 import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import { ProtectedRoute } from "./components.jsx/protectedRoute";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
+import Register from "./pages/register";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<ProtectedRoute />} />
         </Routes>
       </AuthProvider>
