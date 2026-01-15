@@ -12,11 +12,6 @@ export default function Login() {
   let navigate = useNavigate();
   const { user } = useAuth();
 
-  // if(!user){
-  //   getUser();
-  // }
-
-  console.log(user, "from login page");
   if (user) {
     navigate("/dashboard");
   }
