@@ -5,7 +5,7 @@ import Table from "../components.jsx/table";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Dashboard() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   return (
     <div className="bg-gray-100 h-screen w-full">
@@ -25,7 +25,7 @@ export default function Dashboard() {
           <div className="flex flex-col gap-2">
             <div className="w-full h-10 rounded-xl px-2 py-1 flex items-center justify-left gap-5">
               <AccountCircleIcon />
-              Hi Aman
+              Hi {user?.name || "User"}
             </div>
             <button
               onClick={logout}
