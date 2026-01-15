@@ -25,7 +25,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       const response = await axiosInstance.post("/auth/logout");
-      navigate("/login");
+      setUser(null);
+      navigate("/login", { replace: true });
       console.log(response);
     } catch (error) {
       console.error(error);

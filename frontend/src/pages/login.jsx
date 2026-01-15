@@ -25,8 +25,8 @@ export default function Login() {
         email,
         password,
       });
-      alert(response.data.message);
       navigate("/dashboard");
+      console.log("reponse", response);
     } catch (error) {
       alert(error.response?.data?.message || "User login failed!");
     }
