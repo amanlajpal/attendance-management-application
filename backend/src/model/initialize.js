@@ -1,4 +1,9 @@
-import client from "../connection/pgdb.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+// Dynamic import AFTER dotenv is loaded to ensure DATABASE_URL is available
+const { default: client } = await import("../connection/pgdb.js");
 
 console.log("Initializing PostgreSQL Db");
 
@@ -31,7 +36,10 @@ async function createUserAndRelatedExtension() {
 
     await client.query(`
             CREATE TYPE attendance_enum AS ENUM ('P', 'A');
-        `)
+        `).catch((err) => {
+            // Type might already exist, that's okay
+            if (err.code !== '42710') throw err;
+        })
 
 
     await client.query(`

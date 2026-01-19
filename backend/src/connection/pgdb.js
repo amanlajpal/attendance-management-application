@@ -1,15 +1,19 @@
 import { Client } from "pg";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-const client = new Client({
+const connectionObj = process.env.NODE_ENV === "production" ? {
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+} : {
     database: "attendance",
     user: "postgres",
     password: process.env.PGDB_Password,
     host: "localhost",
     port: 5432,
-});
+}
+
+const client = new Client(connectionObj);
 
 client.connect()
     .then(() => {

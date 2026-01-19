@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import logger from "./src/middlewares/logger.js"
 import authRouter from "./src/routes.js/authRoutes.js";
@@ -7,8 +6,6 @@ import attendeeRouter from "./src/routes.js/attendee.js"
 import attendanceRouter from "./src/routes.js/attendance.js"
 import authorization from "./src/middlewares/authorization.js";
 import cookieParser from "cookie-parser";
-
-dotenv.config();
 
 const app = express();
 
