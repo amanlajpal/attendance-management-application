@@ -4,6 +4,15 @@ import client from "../connection/pgdb.js";
 import jwt from "jsonwebtoken";
 import authorization from "../middlewares/authorization.js";
 
+const isProd = process.env.NODE_ENV === "production";
+const cookieOptions = {
+    httpOnly: true,
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+    maxAge: 60 * 60 * 24 * 1000,
+    path: "/",
+};
+
 const authRouter = express.Router();
 
 authRouter.post("/register", async (req, res) => {
@@ -68,10 +77,7 @@ authRouter.post("/login", async (req, res) => {
 
         const token = jwt.sign({ userId: foundUser.id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-        res.cookie("jwt", token, {
-            httpOnly: true, sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 1000
-        });
+        res.cookie("jwt", token, cookieOptions);
 
         res.status(200).send({
             message: "Logged in successfully!",
@@ -88,7 +94,7 @@ authRouter.post("/login", async (req, res) => {
 authRouter.use(authorization);
 
 authRouter.post("/logout", async (req, res) => {
-    res.clearCookie("jwt", { httpOnly: true });
+    res.clearCookie("jwt", { ...cookieOptions });
     res.status(200).send({
         message: "User logged out successfully"
     })
